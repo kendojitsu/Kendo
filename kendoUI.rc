@@ -1,0 +1,263 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\kendoUI.ico"
+
+IDI_ICON_GITHUB         ICON                    "res\\GitHub.ico"
+
+IDI_ICON_EMAIL          ICON                    "res\\Email.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 160, 160
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Kendo"
+FONT 9, "Segoe UI", 400, 0, 0x0
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,59,10,20,20,SS_REALSIZEIMAGE
+    LTEXT           "Kendo",IDC_STATIC,64,50,40,8,SS_NOPREFIX
+    LTEXT           "version 0.1",IDC_STATIC_VERSION,66,60,28,8
+    LTEXT           "Developer X",IDC_STATIC,61,75,57,8
+    LTEXT           "Build Nov 16 2023",IDC_STATIC,52,85,69,8
+    ICON            IDI_ICON_GITHUB,IDC_STATIC,24,100,20,20,SS_REALSIZEIMAGE
+    CONTROL         "<a href=""www.company.com/"">www.company.com/</a>",IDC_SYSLINK1,
+                    "SysLink",0x0,41,100,101,14
+    ICON            IDI_ICON_EMAIL,IDC_STATIC,24,112,20,20,SS_REALSIZEIMAGE
+    LTEXT           "@gmail.com",IDC_STATIC,51,112,59,8
+    DEFPUSHBUTTON   "",IDOK,98,130,50,14,WS_GROUP
+END
+
+IDD_kendoUI_DIALOG DIALOGEX 0, 0, 601, 366
+STYLE DS_ABSALIGN | DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Kendo"
+MENU IDR_MENU1
+FONT 9, "������", 400, 0, 0x86
+BEGIN
+    CONTROL         "List4",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,0,64,600,101
+    CONTROL         "Tree1",IDC_TREE1,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,0,173,293,153
+    EDITTEXT        IDC_EDIT1,303,173,295,153,ES_MULTILINE | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+END
+
+IDD_SHORTCUT_DIALOG DIALOGEX 0, 0, 309, 177
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION ""
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "",IDOK,252,156,50,14
+    CONTROL         "",IDC_LIST2,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,295,143
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,0,0,0
+ PRODUCTVERSION 2,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "FileDescription", "Kendo"
+            VALUE "FileVersion", "0.0.0.0"
+            VALUE "LegalCopyright", " (C) 2023"
+            VALUE "OriginalFilename", "Kendo.EXE"
+            VALUE "ProductName", "Kendo"
+            VALUE "ProductVersion", "0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_kendoUI_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SHORTCUT_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+IDR_MANIFEST            RT_MANIFEST             "res\\windows.manifest"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU
+BEGIN
+    POPUP "File(&F)"
+    BEGIN
+        MENUITEM "Open(&O)\tCtrl+O",              ID_MENU_FILE_OPEN
+        MENUITEM "closure\tCtrl+W",                  ID_MENU_FILE_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "Save as(&S)\tCtrl+S",             ID_MENU_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "Clean cache files",                      ID_MENU_FILE_CLEAR_CACHE
+        MENUITEM SEPARATOR
+        MENUITEM "quit(&X)\tAlt+F4",              ID_MENU_FILE_EXIT
+    END
+    POPUP "help(&H)"
+    BEGIN
+        MENUITEM "List of shortcut keys",                       ID_MENU_HELP_SHORTCUT
+        MENUITEM "about kendo",                ID_MENU_HELP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MENU1 ACCELERATORS
+BEGIN
+    VK_RETURN,      ID_ACCELERATOR32796,    VIRTKEY, NOINVERT
+    "W",            ID_MENU_FILE_CLOSE,     VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          ID_MENU_FILE_EXIT,      VIRTKEY, ALT, NOINVERT
+    "O",            ID_MENU_FILE_OPEN,      VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_MENU_FILE_SAVEAS,    VIRTKEY, CONTROL, NOINVERT
+END
+
+IDR_ACCELERATOR1 ACCELERATORS
+BEGIN
+    "G",            IDC_LIST1,              VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR1 TOOLBAR 24, 24
+BEGIN
+    BUTTON      ID_TOOLBARBTN_DEVLIST
+    BUTTON      ID_TOOLBARBTN_START
+    BUTTON      ID_TOOLBARBTN_STOP
+    SEPARATOR
+    BUTTON      ID_MENU_FILE_OPEN
+    BUTTON      ID_MENU_FILE_SAVEAS
+END
+
+IDR_TOOLBAR2 TOOLBAR 24, 24
+BEGIN
+    BUTTON      ID_TOOLBARBTN_FILTERLIST
+    BUTTON      ID_TOOLBARBTN_CLEAR
+    BUTTON      ID_TOOLBARBTN_FILTER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR1            BITMAP                  "res\\toolbar1.bmp"
+
+IDB_BITMAP_START        BITMAP                  "res\\start.bmp"
+
+IDB_BITMAP_OPEN         BITMAP                  "res\\open.bmp"
+
+IDB_BITMAP_SAVEAS       BITMAP                  "res\\saveas.bmp"
+
+IDB_BITMAP_STOP         BITMAP                  "res\\stop.bmp"
+
+IDB_BITMAP_FILTER       BITMAP                  "res\\filter.bmp"
+
+IDB_BITMAP_CLEAR        BITMAP                  "res\\clear.bmp"
+
+IDR_TOOLBAR2            BITMAP                  "res\\toolbar2.bmp"
+
+IDB_BITMAP_DEV          BITMAP                  "res\\dev.bmp"
+
+IDB_BITMAP_FILTERLIST   BITMAP                  "res\\filterlist.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_ABOUTBOX            "about Kendo(&A)..."
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_STATUS     "ready"
+    ID_INDICATOR_PKT_TOTAL_NUM "data pack：0"
+    ID_INDICATOR_PKT_DISPLAY_NUM "Shown：0（0.0%）"
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+
