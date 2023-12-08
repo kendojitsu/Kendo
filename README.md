@@ -121,6 +121,11 @@ The system is designed to offer comprehensive functionality for real-time captur
 This project is built using the C++ programming language, ensuring efficiency and high-performance capabilities in network packet capture and analysis.
 </p>
 
+<h3 align="left">Support:</h3>
+<p><a href="https://www.buymeacoffee.com/kendojitsu"> <img align="left" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" height="50" width="210" alt="supercoders" /></a></p><br>
+
+<br><br>
+
 <h2>Licence</h2>
 
 Kendo, developed under the GNU GPLv2 license, operates with certain licensing provisions. To ensure clarity, please refer to the full text of the license found in the COPYING file, as it is the legally binding document. The following notes are intended to aid those unfamiliar with the GPLv2.
