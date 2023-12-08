@@ -120,3 +120,35 @@ The system is designed to offer comprehensive functionality for real-time captur
 <br>
 This project is built using the C++ programming language, ensuring efficiency and high-performance capabilities in network packet capture and analysis.
 </p>
+
+<h2>Licence</h2>
+
+Kendo, developed under the GNU GPLv2 license, operates with certain licensing provisions. To ensure clarity, please refer to the full text of the license found in the COPYING file, as it is the legally binding document. The following notes are intended to aid those unfamiliar with the GPLv2.
+
+1. **Usage Restrictions:**
+   - There are no restrictions on the use of Kendo.
+   - Restrictions apply to the distribution of Kendo in both source and binary forms.
+
+2. **License Coverage:**
+   - Most components of Kendo are licensed under "GPL version 2 or later."
+   - Some files may be subject to different licenses compatible with the GPLv2.
+
+3. **Special Cases:**
+   - Certain utilities within the Kendo source have distinct licenses:
+     - The WinPcap utility is licensed under the GPLv3+.
+   - Despite these exceptions, only the tools themselves are subject to these licenses, and the output of the tools is not considered a derived work. Thus, the output can be safely licensed for Kendo's use.
+
+4. **Library Distribution:**
+   - Parts of Kendo may be built and distributed as libraries.
+   - These library components remain under the GPL and are not subject to the Lesser General Public License or any other license.
+
+5. **Integration into Applications:**
+   - If you integrate all or part of Kendo into your own application, the application must be released under a license compatible with the GPL.
+
+By adhering to these licensing terms, users and developers ensure compliance with the GNU GPLv2 license governing Kendo. It is advisable to consult the full license text for authoritative information on the legal aspects of Kendo's distribution and usage.
+
+<h2>Disclaimer:</h2>
+
+This product comes with no warranties, either expressed or implied. Users are advised to utilize the product at their own risk.
+
+For inquiries or communication with the Kendo Team, please contact us at kendojitsu.katana@gmail.com.
