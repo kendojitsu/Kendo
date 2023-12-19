@@ -58,17 +58,17 @@ BOOL CAboutDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	/*Get the path */
+	/*Get program path*/
 	WCHAR l_wcaAppPath[MAX_PATH];//Save application path
 	::GetModuleFileName(NULL, (LPSTR)l_wcaAppPath, MAX_PATH);
 
-	/* »ñµÃ°æ±¾ÐÅÏ¢´óÐ¡ */
-	UINT l_uiVersionInfoSize;//±£´æ°æ±¾ÐÅÏ¢×ÜÌåµÄ´óÐ¡
+	/* Get version information size */
+	UINT l_uiVersionInfoSize;//The overall size of the saved version information
 	TCHAR * l_ptcVersionInfo;
-	l_uiVersionInfoSize = ::GetFileVersionInfoSize((LPSTR)l_wcaAppPath, 0);//»ñµÃ´óÐ¡ 
-	l_ptcVersionInfo = new TCHAR[l_uiVersionInfoSize];//ÉêÇë¿Õ¼ä  
+	l_uiVersionInfoSize = ::GetFileVersionInfoSize((LPSTR)l_wcaAppPath, 0);//get size
+	l_ptcVersionInfo = new TCHAR[l_uiVersionInfoSize];//Apply for space 
 
-	 /* ¸Ã½á¹¹ÓÃÓÚ»ñµÃ°æ±¾ÐÅÏ¢µÄÓïÑÔÐÅÏ¢ */
+	 /* This structure is used to obtain language information of version information */
 	struct VersionLanguage
 	{
 		WORD m_wLanguage;
@@ -78,22 +78,22 @@ BOOL CAboutDlg::OnInitDialog()
 	VersionLanguage * l_ptVersionLanguage;
 	UINT l_uiSize;
 
-	if (::GetFileVersionInfo((LPSTR)l_wcaAppPath, 0, l_uiVersionInfoSize, l_ptcVersionInfo) != 0)//»ñÈ¡°æ±¾ÐÅÏ¢ 
+	if (::GetFileVersionInfo((LPSTR)l_wcaAppPath, 0, l_uiVersionInfoSize, l_ptcVersionInfo) != 0)//Get version information
 	{
 
-		if (::VerQueryValue(l_ptcVersionInfo, _T("\\VarFileInfo\\Translation"), reinterpret_cast<LPVOID*>(&l_ptVersionLanguage), &l_uiSize))//²éÑ¯ÓïÑÔÐÅÏ¢²¢±£´æ
+		if (::VerQueryValue(l_ptcVersionInfo, _T("\\VarFileInfo\\Translation"), reinterpret_cast<LPVOID*>(&l_ptVersionLanguage), &l_uiSize))//Query language information and save
 		{
-			/* Éú³É²éÑ¯ÐÅÏ¢¸ñÊ½·û */
+			/* Generate query information formatter */
 			CString l_cstrSubBlock;
 			l_cstrSubBlock.Format(_T("\\StringFileInfo\\%04x%04x\\ProductVersion"), l_ptVersionLanguage->m_wLanguage, l_ptVersionLanguage->m_wCcodePage);
 
 			LPVOID * l_pvResult;
 
-			/* ²éÑ¯Ö¸¶¨ÐÅÏ¢ */
+			/* Query specified information */
 			if (::VerQueryValue(static_cast<LPVOID>(l_ptcVersionInfo), l_cstrSubBlock.GetBuffer(), reinterpret_cast<LPVOID*>(&l_pvResult), &l_uiSize))
 			{
-				CString l_cstrProductVersion(reinterpret_cast<TCHAR *>(l_pvResult));// »ñµÃ°æ±¾ÐÅÏ¢
-				GetDlgItem(IDC_STATIC_VERSION)->SetWindowTextA("ver "+ l_cstrProductVersion);// °æ±¾ÐÅÏ¢´òÓ¡µ½¹ØÓÚ´°¿ÚÉÏ
+				CString l_cstrProductVersion(reinterpret_cast<TCHAR *>(l_pvResult));// Get version information
+				GetDlgItem(IDC_STATIC_VERSION)->SetWindowTextA("ver "+ l_cstrProductVersion);// Version information is printed to the About window
 			}
 
 		}
@@ -129,10 +129,10 @@ CkendoUIDlg::CkendoUIDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	m_catcher.setPool(&m_pool);		// catcher³õÊ¼»¯
-	//m_dumper.setPool(&m_pool);		// dumper³õÊ¼»¯
+	m_catcher.setPool(&m_pool);		// catcher initialization
+	//m_dumper.setPool(&m_pool);		// dumper initialization
 
-	/* ±êÖ¾³õÊ¼»¯ */
+	/* Flag initialization */
 	m_pktCaptureFlag = false;
 	m_fileOpenFlag = false;	
 }
@@ -181,7 +181,7 @@ END_MESSAGE_MAP()
 // CkendoUIDlg message handlers
 
 /**
-*	@brief UI½çÃæ³õÊ¼»¯
+*	@brief UI interface initialization
 *	@param	-
 *	@return	-
 */
@@ -213,16 +213,16 @@ BOOL CkendoUIDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 	
 	// TODO: Add extra initialization here
-	initialAccelerator();				// ¿ì½Ý¼ü³õÊ¼»¯
-	initialMenuBar();					// ²Ëµ¥À¸³õÊ¼»¯
-	initialToolBar();					// ¹¤¾ßÀ¸³õÊ¼»¯
-	initialComboBoxDevList();			// Íø¿¨ÁÐ±í³õÊ¼»¯
-	initialComboBoxFilterList();		// ¹ýÂËÆ÷ÁÐ±í³õÊ¼»¯
-	initialListCtrlPacketList();		// ÁÐ±í¿Ø¼þ£¨Êý¾Ý°üÁÐ±í£©³õÊ¼»¯
-	initialTreeCtrlPacketDetails();		// Ê÷ÐÎ¿Ø¼þ£¨Êý¾Ý°üÏêÇé£©³õÊ¼»¯
-	initialEditCtrlPacketBytes();		// ±à¼­¿Ø¼þ£¨Êý¾Ý°ü×Ö½ÚÁ÷£©³õÊ¼»¯
-	initialStatusBar();					// ×´Ì¬À¸³õÊ¼»¯
-	createDirectory(".\\tmp");			// ÅÐ¶ÏtmpÎÄ¼þ¼ÐÊÇ·ñ´æÔÚ£¬²»´æÔÚÔò´´½¨
+	initialAccelerator();				// Shortcut key initialization
+	initialMenuBar();					// Menu bar initialization
+	initialToolBar();					// Toolbar initialization
+	initialComboBoxDevList();			// Network card list initialization
+	initialComboBoxFilterList();		// Filter list initialization
+	initialListCtrlPacketList();		// List control (packet list) initialization
+	initialTreeCtrlPacketDetails();		// Tree control (packet details) initialization
+	initialEditCtrlPacketBytes();		// Edit control (packet byte stream) initialization
+	initialStatusBar();					// Status bar initialization¯
+	createDirectory(".\\tmp");			// Determine whether the tmp folder exists, create it if it does not exist
 	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -279,22 +279,22 @@ HCURSOR CkendoUIDlg::OnQueryDragIcon()
 }
 /*************************************************************
 *
-*		°´Å¥ÊÂ¼þÊµÏÖ
+*		Button event implementation
 *
 *************************************************************/
 /**
-*	@brief	°´ÏÂ¿ªÊ¼°´Å¥£¬¿ªÊ¼×¥°ü
+*	@brief	Press the start button to start capturing packets
 *	@param	-
 *	@return	-
 */
 void CkendoUIDlg::OnClickedStart()
 {
-	// »ñÈ¡µ±Ç°Ê±¼ä
-	time_t tt = time(NULL);	// Õâ¾ä·µ»ØµÄÖ»ÊÇÒ»¸öÊ±¼ä´Á
+	// Get current time
+	time_t tt = time(NULL);	// This sentence returns only a timestamp
 	localtime(&tt);
 	CTime currentTime(tt);
 
-	/* ÈôÃ»ÓÐÑ¡ÖÐÍø¿¨£¬±¨ÌáÊ¾ÐÅÏ¢£»·ñÔò£¬´´½¨Ïß³Ì×¥°ü */
+	/* If the network card is not selected, a prompt message will be reported; otherwise, a thread will be created to capture packets. */
 	int selItemIndex = m_comboBoxDevList.GetCurSel();
 	if (selItemIndex <= 0)
 	{
@@ -305,7 +305,7 @@ void CkendoUIDlg::OnClickedStart()
 	if (m_catcher.openAdapter(selItemIndex, currentTime))
 	{
 		CString status = "capturing:" + m_catcher.getDevName();
-		/* ÐÞ¸Ä¿Ø¼þÊ¹ÄÜ×´Ì¬ */
+		/* Modify control enable status */
 		m_comboBoxDevList.EnableWindow(FALSE);
 		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_TOOLBARBTN_START, FALSE);
 		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_TOOLBARBTN_STOP, TRUE);
@@ -313,9 +313,9 @@ void CkendoUIDlg::OnClickedStart()
 		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, FALSE);
 		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, FALSE);
 
-		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"´ò¿ª"
-		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"¹Ø±Õ"
-		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"Áí´æÎª"
+		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_GRAYED);	// Disable menu item "Open"
+		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// Disable menu item "Close"
+		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_GRAYED);	// Disable menu item "Save As"
 		
 		/* Çå¿Õ¿Ø¼þÏÔÊ¾ÄÚÈÝ */
 		m_listCtrlPacketList.DeleteAllItems();
@@ -324,10 +324,10 @@ void CkendoUIDlg::OnClickedStart()
 
 		AfxGetMainWnd()->SetWindowText(status);
 
-		/* Çå¿ÕÄÚ´æÖÐÊý¾Ý°ü³Ø */
+		/* Clear the in-memory packet pool */
 		m_pool.clear();
 
-		/* ¸üÐÂ×´Ì¬À¸ */
+		/* Update status bar */
 		updateStatusBar(status, m_pool.getSize(), m_listCtrlPacketList.GetItemCount());
 
 		CString fileName = "kendoUI_" + currentTime.Format("%Y%m%d%H%M%S") + ".pcap";
@@ -342,14 +342,14 @@ void CkendoUIDlg::OnClickedStart()
 }
 
 /**
-*	@brief	°´ÏÂ½áÊø°´Å¥£¬Í£Ö¹×¥°ü£¬É¾³ý´òÓ¡µÄÊý¾Ý°üÏà¹ØÐÅÏ¢£¬Çå³ýÊý¾Ý°üÁ´±í,²¢ÖØÐÂ¿ªÊ¼×¥°ü
+*	@brief	Press the end button to stop packet capture, delete the printed packet-related information, clear the packet list, and restart packet capture.
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::OnClickedStop() 
 {
-	CString status = "²¶»ñ½áÊø£º" + m_catcher.getDevName();
-	AfxGetMainWnd()->SetWindowText(m_pktDumper.getPath());	// ÐÞ¸Ä±êÌâÀ¸
+	CString status = "Capture ends:" + m_catcher.getDevName();
+	AfxGetMainWnd()->SetWindowText(m_pktDumper.getPath());	// Modify title bar
 
 	m_comboBoxDevList.EnableWindow(TRUE);
 	m_toolBarMain.GetToolBarCtrl().EnableButton(ID_TOOLBARBTN_START, TRUE);
@@ -357,10 +357,10 @@ void CkendoUIDlg::OnClickedStop()
 	m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, TRUE);
 	m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, TRUE);
 
-	m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"´ò¿ª"
-	m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"¹Ø±Õ"
-	m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"Áí´æÎª"
-	m_statusBar.SetPaneText(0, status, true);			// ÐÞ¸Ä×´Ì¬
+	m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// Enable menu item "Open"
+	m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// Disable menu item "Close"
+	m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_ENABLED);	// Enable menu item "Save as"
+	m_statusBar.SetPaneText(0, status, true);			// Modify status
 
 	m_catcher.stopCapture();
 	m_pktCaptureFlag = false;
@@ -368,7 +368,7 @@ void CkendoUIDlg::OnClickedStop()
 }
 
 /**
-*	@brief	°´ÏÂ¹ýÂË°´Å¥£¬¸ù¾Ý¹ýÂËÆ÷ÊäÈëµÄÐ­ÒéÃû¹ýÂËÊý¾Ý°ü
+*	@brief	Press the filter button to filter packets based on the protocol name entered in the filter
 *	@param	-
 *	@return -
 */
@@ -389,7 +389,7 @@ void CkendoUIDlg::OnClickedFilter()
 }
 
 /**
-*	@brief	°´ÏÂÇå³ý°´Å¥£¬Çå³ý¹ýÂËÆ÷£¬ÏÔÊ¾ËùÓÐÊý¾Ý°ü
+*	@brief	Press the clear button to clear the filter and display all packets
 *	@param	-
 *	@return -
 */
@@ -405,11 +405,11 @@ void CkendoUIDlg::OnClickedClear()
 }
 /*************************************************************
 *
-*		¿Ø¼þ³õÊ¼»¯
+*		Control initialization
 *
 *************************************************************/
 /**
-*	@brief	¿ì½Ý¼ü³õÊ¼»¯
+*	@brief	Shortcut key initialization
 *	@param	-
 *	@return	-
 */
@@ -420,7 +420,7 @@ void CkendoUIDlg::initialAccelerator()
 }
 
 /**
-*	@brief	²Ëµ¥À¸³õÊ¼»¯
+*	@brief	Menu bar initialization
 *	@param	-
 *	@return -
 */
@@ -429,23 +429,23 @@ void CkendoUIDlg::initialMenuBar()
 	m_menu.LoadMenu(IDR_MENU1);
 	SetMenu(&m_menu);
 
-	/* ²Ëµ¥Ïî½ûÓÃ */
+	/* Menu item disabled */
 //	CMenu* pMenu = this->GetMenu();
 	if (m_menu)
 	{
-		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"¹Ø±Õ"
-		m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"Áí´æÎª"
+		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// Disable menu item "Close"
+		m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// Disable menu item "Save As"
 	}
 }
 
 /**
-*	@brief	¹¤¾ßÀ¸³õÊ¼»¯
+*	@brief	Toolbar initialization
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::initialToolBar()
 {
-	// Ö÷¹¤¾ßÀ¸´´½¨ 
+	// Main toolbar creation 
 	if (!m_toolBarMain.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_TOOLTIPS | CBRS_GRIPPER | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_toolBarMain.LoadToolBar(IDR_TOOLBAR1))
 	{
@@ -453,19 +453,19 @@ void CkendoUIDlg::initialToolBar()
 		return; 
 	}
 
-	// ÔÚÖ÷¹¤¾ßÀ¸°´Å¥ÉÏ´´½¨×éºÏ¿ò£¨Íø¿¨ÁÐ±í£© 
-	//ÔÚ°´Å¥ÉÏ´´½¨×éºÏ¿ò£¬°´Å¥Î»ÖÃ¾ö¶¨ÁË×éºÏ¿òµÄÎ»ÖÃ
+	// Create combo box (list of network cards) on main toolbar button
+	//Create a combo box on the button, the button position determines the position of the combo box
 	int index = m_toolBarMain.CommandToIndex(ID_TOOLBARBTN_DEVLIST);
 	m_toolBarMain.SetButtonInfo(index, ID_TOOLBARBTN_DEVLIST, TBBS_SEPARATOR, 300);//ÉèÖÃ×éºÏ¿òµÄID£¬ÀàÐÍ£¨ÕâÀïÊÇ·Ö¸ôÀ¸£©£¬300ÊÇÖ¸·Ö¸ôÀ¸¿í¶È
 
-	// ¸ù¾Ý·Ö¸ô·ûµÄ³ß´çrect½¨Á¢×éºÏ¿ò																	  
+	// Create a combo box based on the size rect of the separator																	  
 	CRect rect;
 	m_toolBarMain.GetItemRect(index, &rect);
 	rect.left += 10;
 	rect.top += 3;
 	m_comboBoxDevList.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST, rect, &m_toolBarMain, ID_TOOLBARBTN_DEVLIST);
 
-	// ¶ÁÈ¡Ö÷¹¤¾ßÀ¸°´Å¥Í¼±ê£¬´æ´¢µ½ImageList£¬¹¤¾ßÀ¸¶ÁÈ¡ImageList
+	// Read the main toolbar button icon, store it in ImageList, and the toolbar reads ImageList
 	m_imageListMain.Create(BITMAP_WIDTH, BITMAP_HEIGHT, ILC_COLOR24 | ILC_MASK, 0, 0);
 	for (int i = 0; i < BITMAP_LIST_MAIN_SIZE; ++i)
 	{
@@ -474,13 +474,13 @@ void CkendoUIDlg::initialToolBar()
 	}
 	m_toolBarMain.GetToolBarCtrl().SetImageList(&m_imageListMain);
 
-	// ½ûÓÃÖ÷¹¤¾ßÀ¸ÉÏµÄ°´Å¥ 
+	// Disable buttons on the main toolbar
 	//m_toolBarMain.GetToolBarCtrl().EnableButton(IDC_DROPDOWNBTN_DEVLIST, FALSE);
 	m_toolBarMain.GetToolBarCtrl().EnableButton(ID_TOOLBARBTN_STOP, FALSE);
 	m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, FALSE);
 
 	
-	// ¹ýÂËÆ÷¹¤¾ßÀ¸´´½¨
+	// Filter toolbar creation
 	if (!m_toolBarFilter.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_TOOLTIPS | CBRS_GRIPPER | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_toolBarFilter.LoadToolBar(IDR_TOOLBAR2))
 	{
@@ -488,17 +488,17 @@ void CkendoUIDlg::initialToolBar()
 		return;
 	}
 
-	// ÔÚ¹ýÂËÆ÷¹¤¾ßÀ¸°´Å¥ÉÏ´´½¨×éºÏ¿ò£¨¹ýÂËÆ÷ÁÐ±í£©
+	// Create combobox (filter list) on filter toolbar button
     index = m_toolBarFilter.CommandToIndex(ID_TOOLBARBTN_FILTERLIST);
 	m_toolBarFilter.SetButtonInfo(index, ID_TOOLBARBTN_FILTERLIST, TBBS_SEPARATOR, 300);//ÉèÖÃ×éºÏ¿òµÄID£¬ÀàÐÍ£¨ÕâÀïÊÇ·Ö¸ôÀ¸£©£¬300ÊÇÖ¸·Ö¸ôÀ¸¿í¶È
 
-	// ¸ù¾Ý·Ö¸ô·ûµÄ³ß´çrect½¨Á¢×éºÏ¿ò
+	// Create a combo box based on the size rect of the separator
 	m_toolBarFilter.GetItemRect(index, &rect);
 	rect.left += 10;
 	rect.top += 3;
 	m_comboBoxFilterList.Create(WS_CHILD | WS_VISIBLE | WS_VSCROLL | CBS_DROPDOWNLIST, rect, &m_toolBarFilter, ID_TOOLBARBTN_FILTERLIST);
 
-	// ¶ÁÈ¡¹ýÂËÆ÷¹¤¾ßÀ¸°´Å¥Í¼±ê£¬´æ´¢µ½ImageList£¬¹¤¾ßÀ¸¶ÁÈ¡ImageList
+	// Read the filter toolbar button icon, store it in ImageList, and the toolbar reads ImageList
 	m_imageListFilter.Create(BITMAP_WIDTH, BITMAP_HEIGHT, ILC_COLOR24 | ILC_MASK, 0, 0);
 	for (int i = 0; i < BITMAP_LIST_FILTER_SIZE; ++i)
 	{
@@ -507,21 +507,21 @@ void CkendoUIDlg::initialToolBar()
 	}
 	m_toolBarFilter.GetToolBarCtrl().SetImageList(&m_imageListFilter);
 
-	// ÉèÖÃÏÂÀ­ÁÐ±í×ÖÌå
+	// Set drop-down list font
 	m_comboFont.CreateFontA(12, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, 0, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, "ÐÂËÎÌå");
 	m_comboBoxDevList.SetFont(&m_comboFont);
 	m_comboBoxFilterList.SetFont(&m_comboFont);
 
-	// ÉèÖÃÏÂÀ­ÁÐ±í¸ß¶È
+	// Set drop-down list height
 	m_comboBoxDevList.SetItemHeight(-1, 18);
 	m_comboBoxFilterList.SetItemHeight(-1, 18);
 
-	//¿Ø¼þÌõ¶¨Î»  
+	//Control strip positioning
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 }
 
 /**
-*	@brief	»ñÈ¡±¾µØ»úÆ÷Íø¿¨ÁÐ±í,²¢´òÓ¡Íø¿¨ÃèÊöµ½ÏÂÀ­ÁÐ±íÖÐ
+*	@brief	Get the local machine network card list and print the network card description to the drop-down list
 *	@param	-
 *	@return -
 */
@@ -548,7 +548,7 @@ void CkendoUIDlg::initialComboBoxDevList()
 }
 
 /**
-*	@brief	¹ýÂËÆ÷ÁÐ±í³õÊ¼»¯
+*	@brief	Filter list initialization
 *	@param	-
 *	@return -
 */
@@ -573,13 +573,13 @@ void CkendoUIDlg::initialComboBoxFilterList()
 }
 
 /**
-*	@brief	ÁÐ±í¿Ø¼þ£¨Êý¾Ý°üÁÐ±í£©³õÊ¼»¯
+*	@brief	Tree control (packet details) initialization
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::initialListCtrlPacketList()
 {
-	// ¸ù¾Ý¹ýÂËÆ÷¹¤¾ßÀ¸Î»ÖÃµ÷ÕûÁÐ±í¿Ø¼þ£¨Êý¾Ý°üÁÐ±í£©Î»ÖÃ
+	// Adjust list control (packet list) position based on filter toolbar position
 	CRect rect;
 	m_toolBarFilter.GetWindowRect(&rect);
 	ScreenToClient(&rect);
@@ -605,13 +605,13 @@ void CkendoUIDlg::initialListCtrlPacketList()
 }
 
 /**
-*	@brief	Ê÷ÐÎ¿Ø¼þ£¨Êý¾Ý°üÏêÇé£©³õÊ¼»¯
+*	@brief	Tree control (packet details) initialization
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::initialTreeCtrlPacketDetails()
 {
-	// ¸ù¾ÝÁÐ±í¿Ø¼þ£¨Êý¾Ý°üÁÐ±í£©Î»ÖÃµ÷ÕûÊ÷ÐÎ¿Ø¼þ£¨Êý¾Ý°üÏêÇé£©Î»ÖÃ
+	// Adjust the position of the tree control (packet details) based on the position of the list control (packet list)
 	CRect rect, winRect;
 	m_listCtrlPacketList.GetWindowRect(&rect);
 	ScreenToClient(&rect);
@@ -619,13 +619,13 @@ void CkendoUIDlg::initialTreeCtrlPacketDetails()
 }
 
 /**
-*	@brief	±à¼­¿Ø¼þ£¨Êý¾Ý°ü×Ö½ÚÁ÷£©³õÊ¼»¯
+*	@brief	Edit control (packet byte stream) initialization
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::initialEditCtrlPacketBytes()
 {
-	// ¸ù¾ÝÊ÷ÐÎ¿Ø¼þ¿Ø¼þ£¨Êý¾Ý°üÏêÇé£©Î»ÖÃµ÷Õû±à¼­¿Ø¼þ£¨Êý¾Ý°ü×Ö½ÚÁ÷£©Î»ÖÃ
+	// Adjust the position of the edit control (packet byte stream) based on the position of the tree control control (packet details)
 	CRect rect;
 	m_treeCtrlPacketDetails.GetWindowRect(&rect);
 	ScreenToClient(&rect);
@@ -633,13 +633,13 @@ void CkendoUIDlg::initialEditCtrlPacketBytes()
 }
 
 /**
-*	@brief	×´Ì¬À¸³õÊ¼»¯
+*	@brief	Status bar initialization
 *	@param	-
 *	@return -
 */
 void CkendoUIDlg::initialStatusBar()
 {
-	if (m_statusBar.Create(this))	// ´´½¨²Ëµ¥À¸
+	if (m_statusBar.Create(this))	// Create menu bar
 	{
 		static UINT indicators[] =
 		{
@@ -655,14 +655,14 @@ void CkendoUIDlg::initialStatusBar()
 		m_statusBar.SetPaneInfo(index, ID_INDICATOR_STATUS, SBPS_STRETCH, rect.Width() * 0.6);
 		m_statusBar.SetPaneInfo(++index, ID_INDICATOR_PKT_TOTAL_NUM, SBPS_NORMAL, rect.Width() * 0.2);
 		m_statusBar.SetPaneInfo(++index, ID_INDICATOR_PKT_DISPLAY_NUM, SBPS_NORMAL, rect.Width() * 0.15);
-		RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0); // ÏÔÊ¾×´Ì¬À¸
+		RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0); // Show status bar
 	}
 }
 /**
-*	@brief	¸üÐÂ×´Ì¬À¸
-*	@param [in]	status	×´Ì¬
-*	@param [in]	pktTotalNum	Êý¾Ý°ü×ÜÊý	ÖµÎª·Ç¸ºÊýÊ±¸üÐÂ¸Ã×Ö¶Î
-*	@param [in]	pktDisplayNum	Êý¾Ý°üÏÔÊ¾¸öÊý	ÖµÎª·Ç¸ºÊýÊ±¸üÐÂ¸Ã×Ö¶Î
+*	@brief	Update status bar
+*	@param [in]	status	state
+*	@param [in]	pktTotalNum	Total number of packets. Update this word when the value is non-negative.
+*	@param [in]	pktDisplayNum	Display number of data packets. Update this field when the value is non-negative.
 *	@return	-
 */
 void CkendoUIDlg::updateStatusBar(const CString & status, int pktTotalNum, int pktDisplayNum)
@@ -691,13 +691,13 @@ void CkendoUIDlg::updateStatusBar(const CString & status, int pktTotalNum, int p
 }
 
 /**
-*	@brief	ÔÚÖ¸¶¨Â·¾¶ÉÏ´´½¨ÎÄ¼þ¼Ð
-*	@param [in]	dirPath	 ÎÄ¼þ¼ÐÂ·¾¶
-*	@return	true ´´½¨³É¹¦ false ´´½¨Ê§°Ü£¨ÎÄ¼þ¼ÐÒÑ´æÔÚ£©
+*	@brief	Create a folder at the specified path
+*	@param [in]	dirPath	 folder path
+*	@return	true Creation successful false Creation failed (folder already exists)
 */
 bool CkendoUIDlg::createDirectory(const CString& dirPath)
 {
-	if (!PathIsDirectory(dirPath.GetString()))  // ÊÇ·ñÓÐÖØÃûÎÄ¼þ¼Ð
+	if (!PathIsDirectory(dirPath.GetString()))  // Is there a folder with the same name?
 	{
 		::CreateDirectory(dirPath.GetString(), 0);
 		return true;
@@ -706,9 +706,9 @@ bool CkendoUIDlg::createDirectory(const CString& dirPath)
 }
 
 /**
-*	@brief	Çå¿ÕÖ¸¶¨ÎÄ¼þ¼ÐÖÐËùÓÐÎÄ¼þ
-*	@param [in]	dirPath	 ÎÄ¼þ¼ÐÂ·¾¶
-*	@return	true Çå¿Õ³É¹¦ false Çå¿ÕÊ§°Ü
+*	@brief	Clear all files in the specified folder
+*	@param [in]	dirPath	 folder path
+*	@return	true if the clearing is successful false if the clearing fails
 */
 bool CkendoUIDlg::clearDirectory(const CString& dirPath)
 {
@@ -725,16 +725,16 @@ bool CkendoUIDlg::clearDirectory(const CString& dirPath)
 		{
 			isFound = finder.FindNextFile();
 
-			// Ìø¹ý . ºÍ .. ; ·ñÔò»áÏÝÈëÎÞÏÞÑ­»·ÖÐ
+			// Skip . and .. ; otherwise you will get stuck in an infinite loop
 			if (finder.IsDots())
 				continue;
 
-			// Èç¹ûÊÇÄ¿Â¼£¬½øÈëËÑË÷ £¨µÝ¹é£©
+			// If it is a directory, enter the search (recursively)
 			if (finder.IsDirectory())
 			{
 				CString subDirPath = dirPath + finder.GetFileName();
-				clearDirectory(subDirPath); //É¾³ýÎÄ¼þ¼ÐÏÂµÄÎÄ¼þ
-				RemoveDirectory(subDirPath); //ÒÆ³ý¿ÕÎÄ¼þ
+				clearDirectory(subDirPath); // Delete files in a folder
+				RemoveDirectory(subDirPath); // Remove empty files
 			}
 			else
 			{
@@ -747,44 +747,44 @@ bool CkendoUIDlg::clearDirectory(const CString& dirPath)
 }
 
 /**
-*	@brief	´òÓ¡Êý¾Ý°ü¸ÅÒªÐÅÏ¢µ½ÁÐ±í¿Ø¼þ
-*	@param	Êý¾Ý°ü
-*	@return	0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü
+*	@brief	Print packet summary information to a list control
+*	@param	data pack
+*	@return	0 Printing successful -1 Printing failed
 */
 int CkendoUIDlg::printListCtrlPacketList(const Packet &pkt)
 {
 	if (pkt.isEmpty())
 		return -1;
 
-	int row = 0;	// ÐÐºÅ
-	int col = 0;	// ÁÐºÅ
-	/* ´òÓ¡±àºÅ */
+	int row = 0;	// Line number
+	int col = 0;	// Column number
+	/* Print number */
 	CString	strNum;
 	strNum.Format("%d", pkt.num);
 
 	UINT mask = LVIF_PARAM | LVIF_TEXT;
 	
-	// protocol×Ö¶ÎÔÚOnCustomdrawList1()ÖÐÊ¹ÓÃ
+	// The protocol field is used in OnCustomdrawList1()
 	row = m_listCtrlPacketList.InsertItem(mask, m_listCtrlPacketList.GetItemCount(), strNum, 0, 0, 0, (LPARAM)&(pkt.protocol));
 	
 
-	/* ´òÓ¡Ê±¼ä */
+	/* Print Time */
 	CTime pktArrivalTime( (time_t)(pkt.header->ts.tv_sec) ) ;
 	CString strPktArrivalTime = pktArrivalTime.Format("%Y/%m/%d %H:%M:%S");
 	m_listCtrlPacketList.SetItemText(row, ++col, strPktArrivalTime);
 
-	/* ´òÓ¡Ð­Òé */	
+	/* Print agreement */	
 	if (!pkt.protocol.IsEmpty())
 		m_listCtrlPacketList.SetItemText(row, ++col, pkt.protocol);
 	else
 		++col;
 
-	/* ´òÓ¡³¤¶È */
+	/* Print length */
 	CString strCaplen;
 	strCaplen.Format("%d", pkt.header->caplen);
 	m_listCtrlPacketList.SetItemText(row, ++col, strCaplen);
 
-	/* ´òÓ¡Ô´Ä¿MACµØÖ· */
+	/* Print source and destination MAC addresses */
 	if (pkt.ethh != NULL)
 	{
 		CString strSrcMAC = MACAddr2CString(pkt.ethh->srcaddr);
@@ -798,7 +798,7 @@ int CkendoUIDlg::printListCtrlPacketList(const Packet &pkt)
 		col += 2;
 	}
 
-	/* ´òÓ¡Ô´Ä¿IPµØÖ· */
+	/* Print source and destination IP addresses */
 	if (pkt.iph != NULL)
 	{
 		CString strSrcIP = IPAddr2CString(pkt.iph->srcaddr);
@@ -815,9 +815,9 @@ int CkendoUIDlg::printListCtrlPacketList(const Packet &pkt)
 }
 
 /**
-*	@brief	´òÓ¡Êý¾Ý°ü¸ÅÒªÐÅÏ¢µ½ÁÐ±í¿Ø¼þ
-*	@param	pool Êý¾Ý°ü³Ø
-*	@return	>=0 Êý¾Ý°ü³ØÖÐÊý¾Ý°ü¸öÊý -1 ´òÓ¡Ê§°Ü 
+*	@brief	Print packet summary information to a list control
+*	@param	pool packet pool
+*	@return	>=0 Number of packets in the packet pool -1 Printing failed
 */
 int CkendoUIDlg::printListCtrlPacketList(PacketPool &pool)
 {
@@ -831,10 +831,10 @@ int CkendoUIDlg::printListCtrlPacketList(PacketPool &pool)
 }
 
 /**
-*	@brief	±éÀúÊý¾Ý°üÁ´±í£¬¸ù¾Ý¹ýÂËÆ÷Ãû³Æ´òÓ¡Êý¾Ý°üµ½ÁÐ±í¿Ø¼þ
-*	@param	packetLinkList	Êý¾Ý°üÁ´±í
-*	@param	filter	¹ýÂËÆ÷Ãû³Æ
-*	@return	>=0 ¹ýÂË³öµÄÊý¾Ý°ü¸öÊý	-1 ´òÓ¡Ê§°Ü	
+*	@brief	Traverse the data packet list and print the data packets to the list control according to the filter name
+*	@param	packetLinkList packet link list
+*	@param	filter	filter name
+*	@return	>=0 Number of filtered data packets -1 Printing failed
 */
 int CkendoUIDlg::printListCtrlPacketList(PacketPool &pool, const CString &filter)
 {
@@ -845,7 +845,7 @@ int CkendoUIDlg::printListCtrlPacketList(PacketPool &pool, const CString &filter
 	int filterPktNum = 0;
 	for (int i = 0; i < pktNum; ++i)
 	{
-		const Packet &pkt = pool.get(i);// BUG£º¿ÉÄÜÓÐ
+		const Packet &pkt = pool.get(i);// BUG: May be Here
 		if (pkt.protocol == filter)
 		{
 			printListCtrlPacketList(pkt);
@@ -856,9 +856,9 @@ int CkendoUIDlg::printListCtrlPacketList(PacketPool &pool, const CString &filter
 }
 
 /**
-*	@brief ´òÓ¡Êý¾Ý°ü×Ö½ÚÁ÷µ½±à¼­¿ò£¨16½øÖÆÊý¾ÝÇø£©
-*	@param	pkt	Êý¾Ý°ü
-*	@return 0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü
+*	@brief Print the packet byte stream to the edit box (hexadecimal data area)
+*	@param	pkt	data pack
+*	@return 0 Printing successful -1 Printing failed
 */
 int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 {
@@ -872,14 +872,14 @@ int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 	u_char* pASCIIPacketBytes = pkt.pkt_data;
 	for (int byteCount = 0,  byteCount16=0, offset = 0; byteCount < pkt.header->caplen && pHexPacketBytes != NULL; ++byteCount)
 	{
-		/* Èôµ±Ç°×Ö½ÚÊÇÐÐÊ×£¬´òÓ¡ÐÐÊ×Æ«ÒÆÁ¿ */
+		/* If the current byte is the beginning of the line, print the offset of the beginning of the line */
 		if (byteCount % 16 == 0)
 		{
 			strTmp.Format("%04X:", offset);
 			strPacketBytes += strTmp + " ";
 		}
 
-		/* ´òÓ¡16½øÖÆ×Ö½Ú */
+		/* Print hexadecimal bytes */
 		strTmp.Format("%02X", *pHexPacketBytes);
 		strPacketBytes += strTmp + " ";
 		++pHexPacketBytes;
@@ -889,14 +889,14 @@ int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 		{
 		case 8:
 		{
-			/* Ã¿¶ÁÈ¡8¸ö×Ö½Ú´òÓ¡Ò»¸öÖÆ±í·û */
+			/* Print a tab every 8 bytes read */
 			strPacketBytes += "\t";
 			//strPacketBytes += "#";
 		}
 		break;
 		case 16:
 		{
-			/* Ã¿¶ÁÈ¡16¸ö×Ö½Ú´òÓ¡¶ÔÓ¦×Ö½ÚµÄASCII×Ö·û£¬Ö»´òÓ¡×ÖÄ¸Êý×Ö */
+			/* Every 16 bytes read, the ASCII character of the corresponding byte is printed. Only alphanumeric characters are printed. */
 			if (byteCount16 == 16)
 			{
 				strPacketBytes += " ";
@@ -914,10 +914,10 @@ int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 		default:break;
 		}
 	}
-	/* ÈôÊý¾Ý°ü×Ü³¤¶È²»ÊÇ16×Ö½Ú¶ÔÆëÊ±£¬´òÓ¡×îºóÒ»ÐÐ×Ö½Ú¶ÔÓ¦µÄASCII×Ö·û */
+	/* If the total length of the data packet is not aligned to 16 bytes, print the ASCII character corresponding to the last line of bytes. */
 	if (pkt.header->caplen % 16 != 0)
 	{
-		/* ¿Õ¸ñÌî³ä£¬±£Ö¤×Ö½ÚÁ÷16×Ö½Ú¶ÔÆë */
+		/* Space padding ensures 16-byte alignment of the byte stream */
 		for (int spaceCount = 0, byteCount16 = (pkt.header->caplen % 16); spaceCount < 16 - (pkt.header->caplen % 16); ++spaceCount)
 		{
 			strPacketBytes += "  ";
@@ -930,7 +930,7 @@ int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 			}
 		}
 		strPacketBytes += " ";
-		/* ´òÓ¡×îºóÒ»ÐÐ×Ö½Ú¶ÔÓ¦µÄASCII×Ö·û */
+		/* Print the ASCII characters corresponding to the last line of bytes */
 		for (int charCount = 0; charCount < (pkt.header->caplen % 16); ++charCount, ++pASCIIPacketBytes)
 		{
 			strTmp.Format("%c", isalnum(*pASCIIPacketBytes) ? *pASCIIPacketBytes : '.');
@@ -945,9 +945,9 @@ int CkendoUIDlg::printEditCtrlPacketBytes(const Packet & pkt)
 }
 
 /**
-*	@brief	´òÓ¡Êý¾Ý°üÊ×²¿½âÎö½á¹ûµ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt	Êý¾Ý°ü
-*	@return	0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü
+*	@brief	Print the packet header parsing results to the tree control
+*	@param	pkt	data pack
+*	@return	0 Print successfully -1 print
 */
 int CkendoUIDlg::printTreeCtrlPacketDetails(const Packet &pkt)
 {
@@ -975,10 +975,10 @@ int CkendoUIDlg::printTreeCtrlPacketDetails(const Packet &pkt)
 }
 
 /**
-*	@brief	´òÓ¡ÒÔÌ«ÍøÖ¡Ê×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print Ethernet frame header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insert
 */
 int CkendoUIDlg::printEthernet2TreeCtrl(const Packet &pkt, HTREEITEM &parentNode)
 {
@@ -986,7 +986,7 @@ int CkendoUIDlg::printEthernet2TreeCtrl(const Packet &pkt, HTREEITEM &parentNode
 	{
 		return -1;
 	}
-	/* »ñÈ¡Ô´Ä¿MACµØÖ· */
+	/* Get the source and destination MAC addresses */
 	CString strSrcMAC = MACAddr2CString(pkt.ethh->srcaddr);
 	CString	strDstMAC = MACAddr2CString(pkt.ethh->dstaddr);
 	CString strEthType;
@@ -1010,10 +1010,10 @@ int CkendoUIDlg::printEthernet2TreeCtrl(const Packet &pkt, HTREEITEM &parentNode
 }
 
 /**
-*	@brief	´òÓ¡IPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print IP header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insertion failed
 */
 int CkendoUIDlg::printIP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1090,10 +1090,10 @@ int CkendoUIDlg::printIP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡ARPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print ARP header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insertion failed
 */
 int CkendoUIDlg::printARP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1147,10 +1147,10 @@ int CkendoUIDlg::printARP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡ICMPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print ICMP header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insert
 */
 int CkendoUIDlg::printICMP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1328,10 +1328,10 @@ int CkendoUIDlg::printICMP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡TCPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print TCP headers to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insertion failed
 */
 int CkendoUIDlg::printTCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1407,10 +1407,10 @@ int CkendoUIDlg::printTCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡UDPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print UDP header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insertion failed
 */
 int CkendoUIDlg::printUDP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1448,10 +1448,10 @@ int CkendoUIDlg::printUDP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /** 
-*	@brief	´òÓ¡DNS½áµã±êÌâ
-*	@param	pkt	Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return DNS½áµã
+*	@brief	Print DNS node title
+*	@param	pkt	data pack
+*	@param	parentNode parent node
+*	@return DNS node
 */
 HTREEITEM CkendoUIDlg::printDNSBanner(const Packet &pkt, HTREEITEM &parentNode)
 {
@@ -1471,10 +1471,10 @@ HTREEITEM CkendoUIDlg::printDNSBanner(const Packet &pkt, HTREEITEM &parentNode)
 
 
 /**
-*	@brief	´òÓ¡DNSÊ×²¿
-*	@param	pkt	Êý¾Ý°ü
-*	@param	parentNode	¸¸½Úµã
-*	@return 0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü
+*	@brief	Print DNS header
+*	@param	pkt	data pack
+*	@param	parentNode	parent node
+*	@return 0 Printing successful -1 Printing failed
 */
 int CkendoUIDlg::printDNSHeader(const Packet &pkt, HTREEITEM & parentNode)
 {
@@ -1490,7 +1490,7 @@ int CkendoUIDlg::printDNSHeader(const Packet &pkt, HTREEITEM & parentNode)
 	strText += strTmp;
 
 	HTREEITEM DNSFlagNode = m_treeCtrlPacketDetails.InsertItem(strText, parentNode, 0);
-	/* ±êÖ¾×Ó×Ö¶Î */
+	/* flag subfield */
 	switch (pkt.getDNSFlagsQR())
 	{
 	case DNS_FLAGS_QR_REQUEST:	strText = "QR:; Query message (0)";	break;
@@ -1567,9 +1567,9 @@ int CkendoUIDlg::printDNSHeader(const Packet &pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	½«DNS±¨ÎÄÖÐµÄtype×Ö¶Î×ª»»³ÉCStringÀà×Ö·û´®
-*	@param	type	DNS±¨ÎÄÖÐµÄtype×Ö¶Î
-*	@return CString×Ö·û´®
+*	@brief	Convert the type field in the DNS message into a CString class string
+*	@param	type	The type field in the DNS message
+*	@return CString string
 */
 CString CkendoUIDlg::DNSType2CString(const u_short &type)
 {
@@ -1590,9 +1590,9 @@ CString CkendoUIDlg::DNSType2CString(const u_short &type)
 }
 
 /**
-*	@brief	½«DNS±¨ÎÄÖÐµÄclass×Ö¶Î×ª»»³ÉCStringÀà×Ö·û´®
-*	@param	class	DNS±¨ÎÄÖÐµÄclass×Ö¶Î
-*	@return CString×Ö·û´®
+*	@brief	Convert the class field in the DNS message into a CString class string
+*	@param	class The class field in the DNS message
+*	@return CString string
 */
 CString CkendoUIDlg::DNSClass2CString(const u_short &classes)
 {
@@ -1609,11 +1609,11 @@ CString CkendoUIDlg::DNSClass2CString(const u_short &classes)
 
 
 /**
-*	@brief	´òÓ¡DNS²éÑ¯²¿·Ö
-*	@param	DNSQuery	²éÑ¯²¿·Ö
-*	@param	questions	²éÑ¯¼ÇÂ¼Êý
-*	@param	parentNode	¸¸½Úµã
-*	@return	0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü	ÕýÕûÊý DNS²éÑ¯²¿·Ö×Ü³¤¶È
+*	@brief	Print DNS query part
+*	@param	DNSQuery	Query part
+*	@param	questions	Query the number of records
+*	@param	parentNode	parent node
+*	@return	0 Printing successful -1 Printing failed Positive integer DNS query
 */
 int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEITEM &parentNode)
 {
@@ -1624,7 +1624,7 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 	CString strText, strTmp;
 	HTREEITEM DNSQueryNode = m_treeCtrlPacketDetails.InsertItem("Query part: ", parentNode, 0);
 
-	/* ²éÑ¯²¿·Ö */
+	/* Query part */
 	
 	char *p = DNSQuery;
 	//if (questions < 10)
@@ -1634,7 +1634,7 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 			char *name = (char*)malloc(strlen(p) + 1);
 			translateNameInDNS(name, p);
 
-			/* Ìø¹ýÓòÃû×Ö¶Î */
+			/* Skip domain name field */
 			p += strlen(p) + 1;
 			strText.Format("%s: ", name);
 
@@ -1643,7 +1643,7 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 			strText += DNSClass2CString(DNSQuery->classes);
 			m_treeCtrlPacketDetails.InsertItem(strText, DNSQueryNode, 0);
 
-			/* Ìø¹ý²éÑ¯ÀàÐÍºÍ²éÑ¯Àà×Ö¶Î */
+			/* Skip query type and query class fields */
 			p += sizeof(DNS_Query);		
 			free(name);
 		}// for
@@ -1652,11 +1652,11 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 }
 
 /**
-*	@brief	´òÓ¡DNS»Ø´ð²¿·Ö
-*	@param	dnsa		»Ø´ð²¿·Ö
-*	@param	answers		»Ø´ð¼ÇÂ¼Êý
-*	@param	parentNode	¸¸½Úµã
-*	@return	0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü	ÕýÕûÊý DNS»Ø´ð²¿·Ö×Ü³¤¶È
+*	@brief	Print DNS answer section
+*	@param	dnsa		Answer section
+*	@param	answers		Number of answer records
+*	@param	parentNode	parent node
+*	@return	0 Printing successful -1 Printing failed Positive integer DNS response part
 */
 //int printDNSAnswer(char *DNSAnswer, const u_short &answers, const DNS_Header *dnsh, HTREEITEM &parentNode)
 //{
@@ -1665,21 +1665,21 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //		return -1;
 //	}
 //	CString strText, strTmp;
-//	HTREEITEM DNSAnswerNode = m_treeCtrlPacketDetails.InsertItem("»Ø´ð²¿·Ö£º", parentNode, 0);
+//	HTREEITEM DNSAnswerNode = m_treeCtrlPacketDetails.InsertItem("Answer part:", parentNode, 0);
 //
 //	int answerNum = 0, byteCounter = 0;
 //	char *p = DNSAnswer;
-//	/* »Ø´ð²¿·Ö */
+//	/* Answer section */
 //	while (answerNum < answers)
 //	{
-//		/* Ö¸ÏòÖ¸Õë */
+//		/* pointer */
 //		if (*p == 0xc0)
 //		{
 //
-//			/* Ö¸ÏòÆ«ÒÆÁ¿
+//			/* Point to offset
 //			++p;
 //
-//			char *name = (char*)(pkt_data + offset + *(char*)p);			// ÓòÃû
+//			char *name = (char*)(pkt_data + offset + *(char*)p);			// domain name
 //			char *name1 = (char*)malloc(strlen(name)+1);
 //
 //
@@ -1697,14 +1697,14 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //			translateData(dnsh, name, p, 2);
 //			translateName(name1, name);
 //
-//			strText.Format("%s£º", name1);
+//			strText.Format("%s:", name1);
 //
-//			/* Ö¸ÏòÆ«ÒÆÁ¿ */
+//			/* Point to offset */
 //			++p;
 //			++byteCounter;
 //
 //
-//			/* Ö¸ÏòÀàÐÍ*/
+//			/* pointing type */
 //			++p;
 //			++byteCounter;
 //			DNS_ResourceRecord *dnsa = (DNS_ResourceRecord*)p;
@@ -1739,26 +1739,26 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //			strTmp.Format("TTL %lu", ttl);
 //			strText += strTmp + ", ";
 //
-//			/* Ö¸Ïò×ÊÔ´Êý¾Ý³¤¶È */
+//			/* Points to resource data length */
 //			p += sizeof(DNS_ResourceRecord);
 //			byteCounter += sizeof(DNS_ResourceRecord);
 //			u_short data_len = ntohs(*(u_short*)p);
 //
-//			strTmp.Format("×ÊÔ´Êý¾Ý³¤¶È %hu", data_len);
+//			strTmp.Format("Resource data length %hu", data_len);
 //			strText += strTmp + ", ";
 //
-//			/* Ö¸Ïò×ÊÔ´Êý¾Ý */
+//			/* Point to resource data */
 //			p += sizeof(u_short);
 //			byteCounter += sizeof(u_short);
 //
-//			/* ²éÑ¯ÀàÐÍÎªNS¡¢CNAME¡¢PTRµÄ×ÊÔ´Êý¾Ý */
+//			/* Query resource data of type NS, CNAME, PTR */
 //			if (type == 2 || type == 5 || type == 12)
 //			{
 //
-//				/* ×ÊÔ´Êý¾ÝÎªÖ¸Õë0xc0 + Æ«ÒÆÁ¿*/
+//				/* Resource data is pointer 0xc0 + offset */
 //				if (*(char*)p == 0xC0)
 //				{
-//					/* ¸ù¾ÝÆ«ÒÆÁ¿»ñÈ¡Êý¾Ý
+//					/* Get data based on offset
 //					char *data = (char*)(pkt_data + offset + *(char*)(p+1));			// ÓòÃû
 //					char *data1 = (char*)malloc(strlen(data)+1);
 //
@@ -1779,19 +1779,19 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //					strText += strTmp;
 //
 //				}
-//				/* ×ÊÔ´Êý¾Ý´æÔÚÖ¸Õë0xc0 + Æ«ÒÆÁ¿ */
+//				/* Resource data exists at pointer 0xc0 + offset */
 //				else if (isNamePtr(p))
 //				{
 //					char data[70];
 //					char data1[70];
 //
-//					translateData(dnsh, data, p, data_len);		// È¥µôÖ¸Õë0xc0+Æ«ÒÆÁ¿
+//					translateData(dnsh, data, p, data_len);		// Remove pointer 0xc0+offset
 //					translateName(data1, data);								// È¥µô'.'
 //
 //					strTmp.Format("%s", data1);
 //					strText += strTmp;
 //				}
-//				/* ×ÊÔ´Êý¾ÝÖÐ²»´æÔÚÖ¸Õë0xc0 + Æ«ÒÆÁ¿ */
+//				/* Pointer 0xc0 + offset does not exist in resource data */
 //				else
 //				{
 //					char *data = (char*)malloc(data_len);
@@ -1804,7 +1804,7 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //
 //				}
 //			}
-//			/* ²éÑ¯ÀàÐÍÎªAµÄ×ÊÔ´Êý¾Ý */
+//			/* Query resource data of type A */
 //			else if (type == 1)
 //			{
 //				IP_Address data = *(IP_Address*)p;
@@ -1813,7 +1813,7 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //
 //			m_treeCtrlPacketDetails.InsertItem(strText, DNSAnswerNode, 0);
 //
-//			/* Ìø¹ýÊý¾Ý²¿·Ö */
+//			/* Skip data part*/
 //			p += data_len;
 //			byteCounter += data_len;
 //
@@ -1824,13 +1824,13 @@ int CkendoUIDlg::printDNSQuery(char *DNSQuery, const u_short &questions, HTREEIT
 //}
 
 /**
-*	@brief	´òÓ¡DNS×ÊÔ´¼ÇÂ¼
-*	@param	DNSResourceRecord	×ÊÔ´¼ÇÂ¼
-*	@param	resourceRecordNum	×ÊÔ´¼ÇÂ¼Êý
-*	@param	resourceRecordType	×ÊÔ´¼ÇÂ¼ÀàÐÍ£¨»Ø´ð£¬ÊÚÈ¨»Ø´ð£¬¸½¼ÓÐÅÏ¢£©
-*	@param	pDNSHeader			DNSÊ×²¿
-*	@param	parentNode			¸¸½Úµã
-*	@return	0 ´òÓ¡³É¹¦	-1 ´òÓ¡Ê§°Ü ÕýÕûÊý DNS×ÊÔ´¼ÇÂ¼×Ü³¤¶È
+*	@brief	Print DNS resource records
+*	@param	DNSResourceRecord	resource record
+*	@param	resourceRecordNum	Number of resource records
+*	@param	resourceRecordType	Resource record type (answer, authorized answer, additional information)
+*	@param	pDNSHeader			DNS header
+*	@param	parentNode			parent node
+*	@return	0 Printing successful -1 Printing failed Positive integer Total DNS resource records
 */
 int CkendoUIDlg::printDNSResourceRecord(char *DNSResourceRecord, const u_short &resourceRecordNum, const int &resourceRecordType ,const DNS_Header *pDNSHeader, HTREEITEM parentNode)
 {
@@ -1857,8 +1857,8 @@ int CkendoUIDlg::printDNSResourceRecord(char *DNSResourceRecord, const u_short &
 			// name
 			strText = getNameInDNS(p, pDNSHeader) + ": ";
 
-			// Ö¸Ïòtype£¬class£¬ttl
-			p += 2;			// 2 = 0xC0 + Æ«ÒÆÁ¿
+			// oriented type, class, ttl
+			p += 2;			// 2 = 0xC0 + Offset
 		}
 		else
 		{
@@ -1868,7 +1868,7 @@ int CkendoUIDlg::printDNSResourceRecord(char *DNSResourceRecord, const u_short &
 			CString strText, strTmp;
 			strText.Format("%s: ", name);
 
-			// Ö¸Ïòtype£¬class£¬ttl
+			// directional type, class, ttl
 			p += strlen(name) + 1;
 			free(name);
 		}
@@ -1879,13 +1879,13 @@ int CkendoUIDlg::printDNSResourceRecord(char *DNSResourceRecord, const u_short &
 		strTmp.Format("TTL %d", ntohl(pRecord->ttl));
 		strText += strTmp + ", ";
 
-		// Ö¸Ïò×ÊÔ´Êý¾Ý³¤¶È
+		// Points to resource data length
 		p += sizeof(DNS_ResourceRecord);
 		u_short dataLength = *(u_short*)p;
 		strTmp.Format("Resource data length: %hu bytes", dataLength);
 		strText += strTmp + ", ";
 
-		// Ö¸Ïò×ÊÔ´Êý¾Ý
+		// Point to resource data
 		p += sizeof(u_short);
 
 		switch (ntohs(pRecord->type))
@@ -1931,10 +1931,10 @@ int CkendoUIDlg::printDNSResourceRecord(char *DNSResourceRecord, const u_short &
 }
 
 /**
-*	@brief	´òÓ¡DNS±¨ÎÄµ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print DNS messages to the tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insert
 */
 int CkendoUIDlg::printDNS2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1977,10 +1977,10 @@ int CkendoUIDlg::printDNS2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡DHCPÊ×²¿µ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print DHCP header to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insert
 */
 int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -1991,7 +1991,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 
 	HTREEITEM DHCPNode = m_treeCtrlPacketDetails.InsertItem("DHCP", parentNode, 0);
 	CString strText, strTmp;
-	/* ½âÎödhcpÊ×²¿ */
+	/* Parse dhcp header */
 	strText.Format("Message type: %d", pkt.dhcph->op);
 	m_treeCtrlPacketDetails.InsertItem(strText, DHCPNode, 0);
 	
@@ -2030,7 +2030,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 	strText = "Gateway IP address:" + IPAddr2CString(pkt.dhcph->giaddr);
 	m_treeCtrlPacketDetails.InsertItem(strText, DHCPNode, 0);
 	
-	/*  ½âÎödhcpÊ×²¿Ê£Óà²¿·Ö */
+	/* Parse the remainder of the dhcp header */
 	CString strChaddr;
 	for (int i=0; i< 6; ++i)
 	{
@@ -2052,7 +2052,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 	strText += strTmp;
 	m_treeCtrlPacketDetails.InsertItem(strText, DHCPNode, 0);
 	
-	// Ìø¹ýÒýµ¼ÎÄ¼þÃû
+	// Skip boot filename
 	u_char *p = (u_char*)pkt.dhcph->file + 128;
 	
 	if(ntohl(*(u_long*)p) == 0x63825363)
@@ -2061,7 +2061,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 		m_treeCtrlPacketDetails.InsertItem(strText, DHCPNode, 0);
 	}
 	
-	// Ìø¹ýmagic cookie
+	// Skip magic cookie
 	p += 4;
 	
 	while(*p != 0xFF)
@@ -2090,7 +2090,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 			strText.Format("DHCP: %d", *(++p));
 			m_treeCtrlPacketDetails.InsertItem(strText, DHCPOptionNode, 0);
 
-			// Ö¸ÏòÏÂÒ»¸öÑ¡Ïî
+			// Point to next option
 			++p;
 		}
 			break;
@@ -2107,7 +2107,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 			strText = "address:" + IPAddr2CString(*addr);
 			m_treeCtrlPacketDetails.InsertItem(strText, DHCPOptionNode, 0);
 
-			// Ö¸ÏòÏÂÒ»¸öÑ¡Ïî
+			// Point to next option
 			p += 4;
 		}
 			break;
@@ -2124,7 +2124,7 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 			strText.Format("Lease time: %u", time);
 			m_treeCtrlPacketDetails.InsertItem(strText, DHCPOptionNode, 0);
 
-			// Ö¸ÏòÏÂÒ»¸öÑ¡Ïî
+			// Point to next option
 			p += 4;
 		}
 			break;
@@ -2303,10 +2303,10 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 			strText.Format("Length: %d", len);
 			m_treeCtrlPacketDetails.InsertItem(strText, DHCPOptionNode, 0);
 
-			// Ö¸ÏòÑ¡ÏîÄÚÈÝ
+			// Point to option content
 			++p;
 
-			// Ìø¹ýÑ¡ÏîÄÚÈÝ
+			// Skip option content
 			p += len;
 		}
 			break;
@@ -2320,10 +2320,10 @@ int CkendoUIDlg::printDHCP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	´òÓ¡HTTP±¨ÎÄµ½Ê÷ÐÎ¿Ø¼þ
-*	@param	pkt Êý¾Ý°ü
-*	@param	parentNode ¸¸½Úµã
-*	@return	0 ²åÈë³É¹¦	-1 ²åÈëÊ§°Ü
+*	@brief	Print HTTP messages to tree control
+*	@param	pkt data pack
+*	@param	parentNode parent node
+*	@return	0 Insertion successful -1 Insert
 */
 int CkendoUIDlg::printHTTP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 {
@@ -2365,9 +2365,9 @@ int CkendoUIDlg::printHTTP2TreeCtrl(const Packet & pkt, HTREEITEM & parentNode)
 }
 
 /**
-*	@brief	½«MACµØÖ·×ª»»³ÉCStringÀà×Ö·û´®
-*	@param	addr MACµØÖ·
-*	@return	CStringÀà×Ö·û´®
+*	@brief	Convert MAC address to CString class string
+*	@param	addr MAC address
+*	@return	CString class string
 */
 CString CkendoUIDlg::MACAddr2CString(const MAC_Address &addr)
 {
@@ -2384,9 +2384,9 @@ CString CkendoUIDlg::MACAddr2CString(const MAC_Address &addr)
 }
 
 /**
-*	@brief	½«IPµØÖ·×ª»»³ÉCStringÀà×Ö·û´®
-*	@param	addr IPµØÖ·
-*	@return	CStringÀà×Ö·û´®
+*	@brief	Convert IP address to CString class string
+*	@param	 IP address
+*	@return	CString class string
 */
 CString CkendoUIDlg::IPAddr2CString(const IP_Address &addr)
 {
@@ -2403,13 +2403,13 @@ CString CkendoUIDlg::IPAddr2CString(const IP_Address &addr)
 }
 
 /**
-*	@brief	µã»÷ÁÐ±í£¬´òÓ¡Êý¾Ý°üÊ×²¿½âÎö½á¹ûµ½Ê÷ÐÎ¿Ø¼þ ,ÒÔ¼°Êý¾Ý°ü×Ö½ÚÁ÷µ½±à¼­¿Ø¼þ
+*	@brief	Click the list to print the packet header parsing results to the tree control, and the packet byte stream to the edit control
 *	@param	
 *	@return	-
 */
 void CkendoUIDlg::OnClickedList1(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	/* »ñÈ¡Ñ¡ÖÐÐÐµÄÐÐºÅ */
+	/* Get the row number of the selected row */
 	int selectedItemIndex = m_listCtrlPacketList.GetSelectionMark();
 	CString strPktNum = m_listCtrlPacketList.GetItemText(selectedItemIndex, 0);
 	int pktNum = _ttoi(strPktNum);
@@ -2426,7 +2426,7 @@ void CkendoUIDlg::OnClickedList1(NMHDR* pNMHDR, LRESULT* pResult)
 }
 
 /**
-*	@brief	µã»÷³¬Á´½Ó´ò¿ªGithub
+*	@brief	Click the hyperlink to open Github
 *	@param
 *	@return -
 */
@@ -2438,7 +2438,7 @@ void CAboutDlg::OnNMClickSyslink1(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 /**
-*	@brief	¸ù¾ÝÐ­ÒéÃû¸øListCtrl¿Ø¼þµÄItemÌî³äµ×É«
+*	@brief	根据协议名给ListCtrl控件的Item填充底色
 *	@param	-
 *	@return	-
 */
@@ -2451,12 +2451,12 @@ void CkendoUIDlg::OnCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		*pResult = CDRF_NOTIFYITEMDRAW;
 	}
-	else if(CDDS_ITEMPREPAINT == pNMCD->nmcd.dwDrawStage) // Ò»¸öItem(Ò»ÐÐ)±»»æ»­Ç°
+	else if(CDDS_ITEMPREPAINT == pNMCD->nmcd.dwDrawStage) // Before an Item (a row) is painted
 	{
 		COLORREF itemColor;
-		CString *pStrPktProtocol = (CString*)(pNMCD->nmcd.lItemlParam);	// ÔÚprintListCtrlPacketList(pkt)Àï½«Êý¾Ý°üµÄprotocol×Ö¶Î´«µÝ¹ýÀ´
+		CString *pStrPktProtocol = (CString*)(pNMCD->nmcd.lItemlParam);	// Pass the protocol field of the data packet in printListCtrlPacketList(pkt)
 
-		///* Èô¸ÃÐÐ±»Ñ¡ÖÐ£¬Ôò½«Æä±³¾°ÑÕÉ«µ÷ÕûÎª */
+		///* If the row is selected, adjust its background color to */
 		//if (pNMCD->nmcd.uItemState & CDIS_SELECTED)
 		//{
 		//	pNMCD->clrTextBk = RGB(0, 0, 0);
@@ -2465,36 +2465,36 @@ void CkendoUIDlg::OnCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 		{
 			if (*pStrPktProtocol == "ARP")
 			{
-				itemColor = RGB(255, 182, 193);	// ºìÉ«
+				itemColor = RGB(255, 182, 193);	// red
 			}
 			else if (*pStrPktProtocol == "ICMP")
 			{
-				itemColor = RGB(186, 85, 211);	// ×ÏÉ«
+				itemColor = RGB(186, 85, 211);	// Purple
 			}
 			else if (*pStrPktProtocol == "TCP")
 			{
-				itemColor = RGB(144, 238, 144);	// ÂÌÉ«
+				itemColor = RGB(144, 238, 144);	// green
 			}
 			else if (*pStrPktProtocol == "UDP")
 			{
-				itemColor = RGB(100, 149, 237);	// À¶É«
+				itemColor = RGB(100, 149, 237);	// blue
 
 			}
 			else if (*pStrPktProtocol == "DNS")
 			{
-				itemColor = RGB(135, 206, 250);	// Ç³À¶É«
+				itemColor = RGB(135, 206, 250);	// light blue
 			}
 			else if (*pStrPktProtocol == "DHCP")
 			{
-				itemColor = RGB(189, 254, 76);	// µ­»ÆÉ«
+				itemColor = RGB(189, 254, 76);	// light yellow
 			}
 			else if (*pStrPktProtocol == "HTTP")
 			{
-				itemColor = RGB(238, 232, 180);	// »ÆÉ«
+				itemColor = RGB(238, 232, 180);	// yellow
 			}
 			else
 			{
-				itemColor = RGB(211, 211, 211);	// »ÒÉ«
+				itemColor = RGB(211, 211, 211);	// grey
 			}
 			pNMCD->clrTextBk = itemColor;
 		}		
@@ -2503,13 +2503,13 @@ void CkendoUIDlg::OnCustomdrawList1(NMHDR *pNMHDR, LRESULT *pResult)
 }
 /*************************************************************
 *
-*		×Ô¶¨ÒåÏûÏ¢´¦ÀíÊµÏÖ
+*		Custom message processing implementation
 *
 *************************************************************/
 /**
-*	@brief	´¦Àí×Ô¶¨ÒåÏûÏ¢WM_PKTCATCH
-*	@param	wParam	16Î»×Ô¶¨Òå²ÎÊý
-*	@param	lParam	32Î»×Ô¶¨Òå²ÎÊý
+*	@brief	Handle custom messages_PKTCATCH
+*	@param	wParam	16-bit custom parameters
+*	@param	lParam	32-bit custom parameters
 *	@return	
 */
 LRESULT CkendoUIDlg::OnPktCatchMessage(WPARAM wParam, LPARAM lParam)
@@ -2518,7 +2518,7 @@ LRESULT CkendoUIDlg::OnPktCatchMessage(WPARAM wParam, LPARAM lParam)
 	if (pktNum > 0)
 	{
 		Packet &pkt = m_pool.get(pktNum);
-		/* ¼ì²é¹ýÂËÆ÷ÊÇ·ñÆô¶¯£¬ÈôÆô¶¯ÁË£¬ÔòÖ»´òÓ¡·ûºÏ¹ýÂËÆ÷µÄÐÂ²¶»ñÊý¾Ý°ü */
+		/* Check whether the filter is enabled. If enabled, only new captured packets that match the filter will be printed.*/
 		int selFilterIndex = m_comboBoxFilterList.GetCurSel();
 		if (selFilterIndex > 0)
 		{
@@ -2530,16 +2530,16 @@ LRESULT CkendoUIDlg::OnPktCatchMessage(WPARAM wParam, LPARAM lParam)
 		else
 			printListCtrlPacketList(pkt);
 
-		// ÐÞ¸Ä×´Ì¬À¸ - Êý¾Ý°ü×ÜÊý¡¢Êý¾Ý°üÏÔÊ¾¸öÊý
+		// Modify status bar - total number of data packets, number of data packets displayed
 		updateStatusBar(CString(""), m_pool.getSize(), m_listCtrlPacketList.GetItemCount());
 	}
 
 	return 0;
 }
 /**
-*	@brief	´¦Àí×Ô¶¨ÒåÏûÏ¢WM_TEXIT
-*	@param	wParam	16Î»×Ô¶¨Òå²ÎÊý
-*	@param	lParam	32Î»×Ô¶¨Òå²ÎÊý
+*	@brief	Handle custom message WM_TEXIT
+*	@param	wParam	16-bit custom parameters
+*	@param	lParam	32-bit custom parameters
 *	@return
 */
 LRESULT CkendoUIDlg::OnTExitMessage(WPARAM wParam, LPARAM lParam)
@@ -2549,7 +2549,7 @@ LRESULT CkendoUIDlg::OnTExitMessage(WPARAM wParam, LPARAM lParam)
 }
 
 /**
-*	@brief	´¦Àí¹¤¾ßÀ¸°´Å¥ÌáÊ¾
+*	@brief	Handling toolbar button tips
 *	@param	-
 *	@param	-
 *	@return -
@@ -2557,8 +2557,7 @@ LRESULT CkendoUIDlg::OnTExitMessage(WPARAM wParam, LPARAM lParam)
 BOOL CkendoUIDlg::OnToolTipText(UINT, NMHDR * pNMHDR, LRESULT * pResult)
 {
 	TOOLTIPTEXT   *pTTT = (TOOLTIPTEXT*)pNMHDR;
-	UINT  uID = pNMHDR->idFrom;     // Ïàµ±ÓÚÔ­WM_COMMAND´«µÝ·½Ê½µÄwParam£¨low-order£©, ÔÚwParamÖÐ·ÅµÄÔòÊÇ¿Ø¼þµÄID¡£  
-
+	UINT  uID = pNMHDR->idFrom;     // It is equivalent to the wParam (low-order) of the original WM_COMMAND delivery method. What is placed in wParam is the ID of the control.
 	if (pTTT->uFlags  &  TTF_IDISHWND)
 		uID = ::GetDlgCtrlID((HWND)uID);
 	if (uID == NULL)
@@ -2594,7 +2593,7 @@ BOOL CkendoUIDlg::OnToolTipText(UINT, NMHDR * pNMHDR, LRESULT * pResult)
 }
 
 /**
-*	@brief	¿ì½Ý¼ü - Ctrl + G - »ñÈ¡Êý¾Ý°üÁÐ±íÑ¡ÖÐÏî½¹µã
+*	@brief	Shortcut key - Ctrl + G - Get focus of the selected item in the packet list
 *	@param	-
 *	@return	-
 */
@@ -2602,18 +2601,18 @@ void CkendoUIDlg::OnAcceleratorCtrlG()
 {
 	m_listCtrlPacketList.SetFocus();
 
-	/* ´¹Ö±¹ö¶¯Ìõ×Ô¶¯Ìøµ½Ñ¡ÖÐÎ»ÖÃ*/
+	/* The vertical scroll bar automatically jumps to the selected position */
 	int selItemIndex = m_listCtrlPacketList.GetSelectionMark();			
-	int topItemIndex = m_listCtrlPacketList.GetTopIndex();				// ÁÐ±íÖÐµ±Ç°×î¶¥²ã¿É¼ûÏîµÄÏÂ±ê
+	int topItemIndex = m_listCtrlPacketList.GetTopIndex();				// The index of the currently top-most visible item in the list 
 	CRect rc;
-	m_listCtrlPacketList.GetItemRect(selItemIndex, rc, LVIR_BOUNDS);	// »ñµÃÒ»ÐÐµÄ´óÐ¡rc
-	CSize sz(0, (selItemIndex - topItemIndex)*rc.Height());				// £¨selItemIndex - topItemIndex£©±íÊ¾¹ö¶¯Á¿n£¬>0±íÊ¾ÏòÏÂ¹ö¶¯nÐÐ£¬<0±íÊ¾ÏòÉÏ¹ö¶¯nÐÐ£¬
-																		// *rc.Height£¨ÐÐ¸ß£©ÊÇÒòÎªscroll£¨£©°´ÏñËØÖµ¹ö¶¯
-	m_listCtrlPacketList.Scroll(sz);									// ¹ö¶¯µ½Ñ¡ÖÐÎ»ÖÃ
+	m_listCtrlPacketList.GetItemRect(selItemIndex, rc, LVIR_BOUNDS);	// Get the size rc of a row
+	CSize sz(0, (selItemIndex - topItemIndex)*rc.Height());				// (selItemIndex - topItemIndex)Indicates the scroll amount n, >0 means scrolling down n lines, <0 means scrolling up n lines,
+																		// *rc.Height (row height) is because scroll() scrolls by pixel value
+	m_listCtrlPacketList.Scroll(sz);									// Scroll to selected position
 }
 
 /**
-*	@brief	ÔÚÊý¾Ý°üÁÐ±í¿Ø¼þÖÐ£¬ÓÃ·½Ïò¼üÉÏ¡¢ÏÂ¿ØÖÆµ±Ç°Ñ¡ÖÐÐÐ
+*	@brief	In the packet list control, use the up and down arrow keys to control the currently selected row.
 *	@param	-
 *	@return	-
 */
@@ -2622,7 +2621,7 @@ void CkendoUIDlg::OnKeydownList1(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMLVKEYDOWN pLVKeyDow = reinterpret_cast<LPNMLVKEYDOWN>(pNMHDR);
 	bool selectedItemChangedFlag = false;
 	int selectedItemIndex = m_listCtrlPacketList.GetSelectionMark();
-	/* ÅÐ¶Ï°´ÏÂµÄ¼üÊÇ·ñÎª·½Ïò¼üÉÏ»ò·½Ïò¼üÏÂ*/
+	/* Determine whether the pressed key is the direction key up or the direction key down*/
 	switch (pLVKeyDow->wVKey)
 	{
 	case VK_UP:
@@ -2646,7 +2645,7 @@ void CkendoUIDlg::OnKeydownList1(NMHDR *pNMHDR, LRESULT *pResult)
 	default:	break;
 	}
 
-	/* Ñ¡ÖÐÐÐ·¢ËÍ±ä»¯£¬´òÓ¡Êý¾Ý°üÐÅÏ¢ºÍ×Ö½ÚÁ÷ */
+	/* Select the row to send changes and print packet information and byte stream */
 	if (selectedItemChangedFlag)
 	{
 		CString strPktNum = m_listCtrlPacketList.GetItemText(selectedItemIndex, 0);
@@ -2668,14 +2667,14 @@ void CkendoUIDlg::OnKeydownList1(NMHDR *pNMHDR, LRESULT *pResult)
 
 /*************************************************************
 *
-*		DNS¹¤¾ßº¯Êý
+*		DNS tool function
 *
 *************************************************************/
 /**
-*	@brief	½«´øÓÐ×Ö½Ú¼ÆÊýµÄÓòÃûname2×ª»»³ÉÓòÃûname1
-*			Èç£º3www8bilibili3com	->	www.bilibili.com
-*	@param	name1	ÓòÃû
-*	@param	name2	´ø×Ö½Ú¼ÆÊýµÄÓòÃû
+*	@brief	Convert domain name name2 with byte count to domain name name1
+*			Such as: www.financexyz.com  ->	 www.financexyz.com  
+*	@param	name1	domain name
+*	@param	name2	Domain name with byte count
 *	@return	-
 */
 void translateNameInDNS(char *name1, const char *name2)
@@ -2690,7 +2689,7 @@ void translateNameInDNS(char *name1, const char *name2)
 		canMove = true;
 	}
 
-	/* ½«¼ÆÊý×ª»»Îª'.' */
+	/* Convert count to '.'*/
 	while (*p)
 	{
 		if (!isalnum(*p) && *p != '-')
@@ -2700,7 +2699,7 @@ void translateNameInDNS(char *name1, const char *name2)
 		++p;
 	}
 
-	/* ½«ÓòÃûÕûÌåÏòÇ°ÒÆ1Î» */
+	/* Move the entire domain name forward by 1 position */
 	if (canMove)
 	{
 		p = name1;
@@ -2722,7 +2721,7 @@ CString translateNameInDNS(const char *name)
 	{
 		canMove = true;
 	}
-	/* ½«¼ÆÊý×ª»»Îª'.' */
+	/* Convert count to '.' */
 	for (int i = 0; i < strName.GetLength(); ++i)
 	{
 		if (!isalnum(strName.GetAt(i)) && strName.GetAt(i) != '-')
@@ -2731,7 +2730,7 @@ CString translateNameInDNS(const char *name)
 		}
 	}
 
-	/* ½«ÓòÃûÕûÌåÏòÇ°ÒÆ1Î» */
+	/* Move the entire domain name forward by 1 position */
 	if (canMove)
 	{
 		for (int i = 0; i<strName.GetLength(); ++i)
@@ -2741,21 +2740,21 @@ CString translateNameInDNS(const char *name)
 	}
 	return strName;
 }
-/* DNS×ÊÔ´¼ÇÂ¼Êý¾Ý²¿·Ö×ª»» ½«´øÓÐÖ¸Õë0xc0µÄdata2×ª»»Îª²»´øÖ¸ÕëµÄdata1 offsetÎªµ½dnsÊ×²¿µÄÆ«ÒÆÁ¿*/
+/* Convert the data part of DNS resource record. Convert data2 with pointer 0xc0 to data1 without pointer. The offset is the offset to the DNS header.*/
 void translateData(const DNS_Header *dnsh, char *data1, char *data2, const int data2_len)
 {
 	char *p = data2;
 	int count = 0, i = 0;
 
-	/* ±éÀúdata2 */
+	/* Traverse data2 */
 	while (count < data2_len)
 	{
-		/* Ö¸Õë */
+		/* pointer*/
 		if (*(u_char*)p == 0xC0)
 		{
 			++p;
 
-			/* ¶ÁÈ¡Ö¸ÕëËùÖ¸ÏòµÄÊý¾Ý */
+			/* Read the data pointed to by the pointer */
 			char *data_ptr = (char*)((u_char*)dnsh + *(u_char*)p);
 
 			int pos = is0xC0PointerInName(data_ptr);
@@ -2781,10 +2780,10 @@ void translateData(const DNS_Header *dnsh, char *data1, char *data2, const int d
 }
 
 /**
-*	@brief	»ñÈ¡DNSÖÐµÄname×Ö¶Î£¨²éÑ¯ÇøÓò£¬×ÊÔ´¼ÇÂ¼ÇøÓò£©
-*	@param	name		ÓòÃû
-*	@param	pDNSHeader	DNSÊ×²¿Ö¸Õë
-*	@return	ÓòÃû×Ö·û´®
+*	@brief	Get the name field in DNS (query area, resource record area)
+*	@param	name		domain name
+*       @param  pDNSHeader      DNS header pointer
+*	@param	Domain name string
 */
 CString getNameInDNS(char *name, const DNS_Header *pDNSHeader)
 {
@@ -2811,10 +2810,10 @@ CString getNameInDNS(char *name, const DNS_Header *pDNSHeader)
 	}
 }
 /**
-*	@brief	ÅÐ¶ÏnameÖÐÓÐÎÞÖ¸Õë0xC0,²¢·µ»ØÖ¸ÕëÔÚnameÖÐµÄÎ»ÖÃ
-*	@param	name	ÓòÃû
-*	@param	nameLen	ÓòÃû³¤¶È
-*	@return	·Ç0	Ö¸ÕëÔÚnameÖÐµÄÎ»ÖÃ	-1	nameÖÐÎÞÖ¸Õë0xC0	-2	nameÎª¿Õ
+*	@brief	Determine whether there is pointer 0xC0 in name, and return the position of the pointer in name
+*	@param	name domain name
+*	@param	nameLen domain name length
+*	@return	Non-0 pointer position in name -1 There is no pointer in name 0xC0 -2 Name is empty
 */
 int is0xC0PointerInName(char *name)
 {
@@ -2837,7 +2836,7 @@ int is0xC0PointerInName(char *name)
 	return -1;
 }
 /**
-*	@brief	»ñÈ¡0xC0Ö¸ÕëµÄÖµ
+*	@brief	Get the value of the 0xC0 pointer
 *	@param
 *	@return 
 */
@@ -2850,11 +2849,11 @@ CString get0xC0PointerValue(const DNS_Header *pDNSHeader, const int offset)
 }
 /*************************************************************
 *
-*		²Ëµ¥À¸ÊµÏÖ
+*		Menu bar implementation
 *
 *************************************************************/
 /**
-*	@brief	£¨²Ëµ¥À¸ - ÎÄ¼þ - ´ò¿ª£©´úÂëÊµÏÖ
+*	@brief	(Menu Bar - File - Open) Code Implementation
 *	@param	-
 *	@return	-
 */
@@ -2865,26 +2864,26 @@ void CkendoUIDlg::OnMenuFileOpen()
 	{
 		CString openFilePath = dlgFile.GetPathName();
 		CString openFileName = dlgFile.GetFileName();
-		if (dlgFile.GetFileExt() != "pcap")	// ¼ì²éÎÄ¼þÀ©Õ¹Ãû
+		if (dlgFile.GetFileExt() != "pcap")	// Check file extension
 		{
 			AfxMessageBox("Unable to open file" + openFileName + "Please check file extension");
 			return;
 		}
-		if (openFileName == m_openFileName)	// ¼ì²éÎÄ¼þÃû£¬±ÜÃâÖØ¸´´ò¿ª
+		if (openFileName == m_openFileName)	// Check the file name to avoid opening it repeatedly
 		{
 			AfxMessageBox("Cannot open the same file repeatedly" + openFileName);
 			return;
 		}
 		if (m_catcher.openAdapter(openFilePath))	
 		{
-			m_openFileName = openFileName;					// ±£´æÎÄ¼þÃû
-			AfxGetMainWnd()->SetWindowText(openFileName);	// ÐÞ¸Ä±êÌâÀ¸ÎªÎÄ¼þÃû
-			m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"´ò¿ª"
-			m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"¹Ø±Õ"
-			m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"Áí´æÎª"
+			m_openFileName = openFileName;			// save file name
+			AfxGetMainWnd()->SetWindowText(openFileName);	//Modify the title bar to the file name
+			m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// Enable menu item "Open"
+			m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_ENABLED);	// Enable menu item "Close"
+			m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_ENABLED);	// Enable menu item "Save As"
 
-			m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, TRUE);	// ÆôÓÃ¹¤¾ßÀ¸°´Å¥"´ò¿ª"
-			m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, TRUE);	// ÆôÓÃ¹¤¾ßÀ¸°´Å¥"Áí´æÎª"
+			m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, TRUE);	// Enable toolbar button "Open"
+			m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, TRUE);	// Enable toolbar button "Save As"
 
 			m_listCtrlPacketList.DeleteAllItems();
 			m_treeCtrlPacketDetails.DeleteAllItems();
@@ -2897,13 +2896,13 @@ void CkendoUIDlg::OnMenuFileOpen()
 
 			CString status = "File opened: " + openFileName;
 			updateStatusBar(status, -1, -1);
-			//m_statusBar.SetPaneText(0, status, true);		// ÐÞ¸Ä×´Ì¬À¸
+			//m_statusBar.SetPaneText(0, status, true);		//Modify status bar
 		}
 	}
 }
 
 /**
-*	@brief	£¨²Ëµ¥À¸ - ÎÄ¼þ - ¹Ø±Õ£©´úÂëÊµÏÖ
+*	@brief	(Menu Bar - File - Close) Code Implementation
 *	@param	-
 *	@return	-
 */
@@ -2911,13 +2910,13 @@ void CkendoUIDlg::OnMenuFileClose()
 {
 	if (m_fileOpenFlag)
 	{
-		AfxGetMainWnd()->SetWindowText("kendoUI");			// ÐÞ¸Ä±êÌâÀ¸
-		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// ÆôÓÃ²Ëµ¥Ïî"´ò¿ª"
-		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"¹Ø±Õ"
-		m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"Áí´æÎª"
+		AfxGetMainWnd()->SetWindowText("kendoUI");		//Modify title bar
+		m_menu.EnableMenuItem(ID_MENU_FILE_OPEN, MF_ENABLED);	// Enable menu item "Open"
+		m_menu.EnableMenuItem(ID_MENU_FILE_CLOSE, MF_GRAYED);	// Disable menu item "Close"
+		m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// Disable menu item "Save As"
 
-		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, TRUE);	// ÆôÓÃ¹¤¾ßÀ¸°´Å¥"´ò¿ª"
-		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, FALSE);// ½ûÓÃ¹¤¾ßÀ¸°´Å¥"Áí´æÎª"
+		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_OPEN, TRUE);	// Enable toolbar button "Open"
+		m_toolBarMain.GetToolBarCtrl().EnableButton(ID_MENU_FILE_SAVEAS, FALSE);// Disable toolbar button "Save As"
 
 		m_listCtrlPacketList.DeleteAllItems();
 		m_treeCtrlPacketDetails.DeleteAllItems();
@@ -2930,7 +2929,7 @@ void CkendoUIDlg::OnMenuFileClose()
 }
 
 /**
-*	@brief	£¨²Ëµ¥À¸ - ÎÄ¼þ - Áí´æÎª£©´úÂëÊµÏÖ
+*	@brief	(Menu bar - File - Save as) code implementation
 *	@param	-
 *	@return	-
 */
@@ -2939,24 +2938,24 @@ void CkendoUIDlg::OnMenuFileSaveAs()
 	CString saveAsFilePath = _T("");
 	CString dumpFilePath = m_pktDumper.getPath();
 	CString defaultFileName = m_pktDumper.getPath();
-	CFileDialog	dlgFile(FALSE, ".pcap", defaultFileName, OFN_OVERWRITEPROMPT, _T("pcapÎÄ¼þ (*.pcap)|*.pcap|All files (*.*)|*.*||"), NULL);
+	CFileDialog	dlgFile(FALSE, ".pcap", defaultFileName, OFN_OVERWRITEPROMPT, _T("pcap file (*.pcap)|*.pcap|All files (*.*)|*.*||"), NULL);
 
 	if (dlgFile.DoModal() == IDOK)
 	{
 		saveAsFilePath = dlgFile.GetPathName();
 		m_pktDumper.dump(saveAsFilePath);
-		//m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// ½ûÓÃ²Ëµ¥Ïî"Áí´æÎª"
-		AfxGetMainWnd()->SetWindowText(dlgFile.GetFileName());		// ÐÞ¸Ä±êÌâÀ¸
-		m_statusBar.SetPaneText(0, "Saved to: " + saveAsFilePath, true);	// ÐÞ¸Ä×´Ì¬À¸
+		//m_menu.EnableMenuItem(ID_MENU_FILE_SAVEAS, MF_GRAYED);	// Disable menu item "Save As"
+		AfxGetMainWnd()->SetWindowText(dlgFile.GetFileName());		//Modify title bar
+		m_statusBar.SetPaneText(0, "Saved to: " + saveAsFilePath, true); //Change status bar	
 
 	}
 }
-
 /**
-*	@brief	£¨²Ëµ¥À¸ - ÎÄ¼þ - ÇåÀí»º´æÎÄ¼þ£©´úÂëÊµÏÖ
+*	@brief	(Menu bar - File - Clean cache files) Code implementation
 *	@param	-
 *	@return	-
 */
+
 void CkendoUIDlg::OnMenuFileClearCache()
 {
 	if (clearDirectory(".\\tmp\\"))
@@ -2971,7 +2970,7 @@ void CkendoUIDlg::OnMenuFileClearCache()
 }
 
 /**
-*	@brief	£¨²Ëµ¥À¸ - ÎÄ¼þ - ÍË³ö£©´úÂëÊµÏÖ
+*	@brief	(Menu Bar - File - Exit) Code Implementation
 *	@param	-
 *	@return	-
 */
@@ -2981,7 +2980,7 @@ void CkendoUIDlg::OnMenuFileExit()
 }
 
 /**
-*	@brief	£¨²Ëµ¥À¸ - °ïÖú - ¹ØÓÚ£©´úÂëÊµÏÖ
+*	@brief	 (Menu Bar - Help - About) Code Implementation
 *	@param	-
 *	@return	-
 */
@@ -2992,7 +2991,7 @@ void CkendoUIDlg::OnMenuHelpAbout()
 }
 
 /**
-*	@brief	£¨²Ëµ¥À¸ - °ïÖú - ¿ì½Ý¼üÒ»ÀÀ£©´úÂëÊµÏÖ
+*	@brief	(Menu bar - Help - List of shortcut keys) Code implementation
 *	@param	-
 *	@return	-
 */
@@ -3003,7 +3002,7 @@ void CkendoUIDlg::OnMenuHelpShortCut()
 }
 /*************************************************************
 *
-*		¿ì½Ý¼üÊµÏÖ
+*		Shortcut key implementation
 *
 *************************************************************/
 BOOL CkendoUIDlg::PreTranslateMessage(MSG * pMsg)
